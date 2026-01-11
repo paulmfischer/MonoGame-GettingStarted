@@ -13,6 +13,12 @@ using MonoGameLibrary.Scenes;
 
 namespace DungeonSlime.Scenes;
 
+public enum FocusedButton
+{
+    Start,
+    Options
+}
+
 public class TitleScene : Scene
 {
     private const string DUNGEON_TEXT = "Dungeon";
@@ -59,11 +65,13 @@ public class TitleScene : Scene
     private SoundEffect _uiSoundEffect;
     private Panel _titleScreenButtonsPanel;
     private Panel _optionsPanel;
+
     // The options button used to open the options menu.
     private AnimatedButton _optionsButton;
 
     // The back button used to exit the options menu back to the title menu.
     private AnimatedButton _optionsBackButton;
+    private AnimatedButton _startButton;
 
     // Reference to the texture atlas that we can pass to UI elements when they
     // are created.
@@ -124,9 +132,17 @@ public class TitleScene : Scene
     public override void Update(GameTime gameTime)
     {
         // If the user presses enter, switch to the game scene.
-        if (Core.Input.Keyboard.WasKeyJustPressed(Keys.Enter))
+        if (Core.Input.Keyboard.WasKeyJustPressed(Keys.Enter) && _startButton.IsFocused)
         {
             Core.ChangeScene(new GameScene());
+        } else if (Core.Input.Keyboard.WasKeyJustPressed(Keys.Escape) && _optionsPanel.IsVisible)
+        {
+            _titleScreenButtonsPanel.IsVisible = false;
+            _optionsPanel.IsVisible = true;
+
+            // Give the options button on the title panel focus since we are coming
+            // back from the options screen.
+            _optionsButton.IsFocused = true;
         }
 
         // Update the offsets for the background pattern wrapping so that it
@@ -198,14 +214,14 @@ public class TitleScene : Scene
         _titleScreenButtonsPanel.Dock(Gum.Wireframe.Dock.Fill);
         _titleScreenButtonsPanel.AddToRoot();
 
-        AnimatedButton startButton = new(_atlas);
-        startButton.Anchor(Gum.Wireframe.Anchor.BottomLeft);
-        startButton.X = 50;
-        startButton.Y = -12;
-        startButton.Width = 70;
-        startButton.Text = "Start";
-        startButton.Click += HandleStartClicked;
-        _titleScreenButtonsPanel.AddChild(startButton);
+        _startButton = new AnimatedButton(_atlas);
+        _startButton.Anchor(Gum.Wireframe.Anchor.BottomLeft);
+        _startButton.X = 50;
+        _startButton.Y = -12;
+        _startButton.Width = 70;
+        _startButton.Text = "Start";
+        _startButton.Click += HandleStartClicked;
+        _titleScreenButtonsPanel.AddChild(_startButton);
 
         _optionsButton = new AnimatedButton(_atlas);
         _optionsButton.Anchor(Gum.Wireframe.Anchor.BottomRight);
@@ -216,7 +232,7 @@ public class TitleScene : Scene
         _optionsButton.Click += HandleOptionsClicked;
         _titleScreenButtonsPanel.AddChild(_optionsButton);
 
-        startButton.IsFocused = true;
+        _startButton.IsFocused = true;
     }
 
     private void CreateOptionsPanel()
@@ -226,7 +242,7 @@ public class TitleScene : Scene
         _optionsPanel.IsVisible = false;
         _optionsPanel.AddToRoot();
 
-        TextRuntime optionsText = new TextRuntime();
+        TextRuntime optionsText = new();
         optionsText.X = 10;
         optionsText.Y = 10;
         optionsText.Text = "OPTIONS";
@@ -235,7 +251,7 @@ public class TitleScene : Scene
         optionsText.CustomFontFile = @"fonts/04b_30.fnt";
         _optionsPanel.AddChild(optionsText);
 
-        OptionsSlider musicSlider = new OptionsSlider(_atlas);
+        OptionsSlider musicSlider = new(_atlas);
         musicSlider.Name = "MusicSlider";
         musicSlider.Text = "MUSIC";
         musicSlider.Anchor(Gum.Wireframe.Anchor.Top);
@@ -249,7 +265,7 @@ public class TitleScene : Scene
         musicSlider.ValueChangeCompleted += HandleMusicSliderValueChangeCompleted;
         _optionsPanel.AddChild(musicSlider);
 
-        OptionsSlider sfxSlider = new OptionsSlider(_atlas);
+        OptionsSlider sfxSlider = new(_atlas);
         sfxSlider.Name = "SfxSlider";
         sfxSlider.Text = "SFX";
         sfxSlider.Anchor(Gum.Wireframe.Anchor.Top);

@@ -58,9 +58,9 @@ internal class AnimatedButton : Button
         TextureRegion unfocusedTextureRegion = atlas.GetRegion("unfocused-button");
 
         // Create an animation chain for the unfocused state with a single frame
-        AnimationChain unfocusedAnimation = new AnimationChain();
+        AnimationChain unfocusedAnimation = new();
         unfocusedAnimation.Name = nameof(unfocusedAnimation);
-        AnimationFrame unfocusedFrame = new AnimationFrame
+        AnimationFrame unfocusedFrame = new()
         {
             TopCoordinate = unfocusedTextureRegion.TopTextureCoordinate,
             BottomCoordinate = unfocusedTextureRegion.BottomTextureCoordinate,
@@ -75,11 +75,11 @@ internal class AnimatedButton : Button
         Animation focusedAtlasAnimation = atlas.GetAnimation("focused-button-animation");
 
         // Create an animation chain for the focused state using all frames from the atlas animation
-        AnimationChain focusedAnimation = new AnimationChain();
+        AnimationChain focusedAnimation = new();
         focusedAnimation.Name = nameof(focusedAnimation);
         foreach (TextureRegion region in focusedAtlasAnimation.Frames)
         {
-            AnimationFrame frame = new AnimationFrame
+            AnimationFrame frame = new()
             {
                 TopCoordinate = region.TopTextureCoordinate,
                 BottomCoordinate = region.BottomTextureCoordinate,
@@ -141,12 +141,12 @@ internal class AnimatedButton : Button
     /// </summary>
     private void HandleKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Keys.Left)
+        if (e.Key == Keys.Left || e.Key == Keys.A)
         {
             // Left arrow navigates to previous control
             HandleTab(TabDirection.Up, loop: true);
         }
-        if (e.Key == Keys.Right)
+        if (e.Key == Keys.Right || e.Key == Keys.D)
         {
             // Right arrow navigates to next control
             HandleTab(TabDirection.Down, loop: true);
